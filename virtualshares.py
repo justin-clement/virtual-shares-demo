@@ -1,3 +1,4 @@
+
 # Decorator function to handle errors.
 def try_except(func):
 	def wrapper(*args, **kwargs):
