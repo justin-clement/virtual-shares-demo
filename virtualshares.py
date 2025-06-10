@@ -1,6 +1,6 @@
 
 # Decorator function to handle errors.
-def try_except(func):
+def safe_run(func):
 	def wrapper(*args, **kwargs):
 		try:
 			result = func(*args, **kwargs)
@@ -50,11 +50,11 @@ class VirtualShares:
 
 	# The following are user-oriented methods. 
 
-	@try_except
+	@safe_run
 	def display_owner_info(self):
 		print(f" {self.owner_id} owns {self.__shares} virtual shares.")
 
-	@try_except
+	@safe_run
 	@line
 	def direct_purchase(self, number_of_shares: float):
 		"""Purchase shares from Service directly, if available."""
@@ -78,7 +78,7 @@ class VirtualShares:
 		return {'status': True, 'message': f'direct purchase of shares from Service by {self.owner_id} successful'}
 	
 	# The Sell function should be a private method. 	
-	@try_except
+	@safe_run
 	def __sell(self, number_of_shares: float, buyer: object):
 		"""Initiate a sell transaction by a client (after agreement to sell)."""
 
@@ -96,11 +96,11 @@ class VirtualShares:
 			return {'status': True, 'message': f'sale of shares from {self.owner_id} to {buyer.owner_id} successful'}
 
 	# This is the method used to call the Sell function.
-	@try_except
+	@safe_run
 	def process_sell(self, number_of_shares: float, buyer: object):
 		return self.__sell(number_of_shares, buyer)
 
-	@try_except
+	@safe_run
 	@line
 	def peer_purchase(self, number_of_shares: float, seller: object):
 		"""Purchase shares from another user."""
