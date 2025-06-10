@@ -6,8 +6,10 @@ def safe_run(func):
 			result = func(*args, **kwargs)
 			return result
 		except Exception as e:
-				print("\n")
-				print({'status': False, 'message': f'An exception occured ({e})'})   # In production, this will be passed to the error log.
+			print("\n")
+			error_message = {'status': False, 'message': f'An exception occured ({e})'}
+			print(error_message)   # In production, this will be passed to the error log.
+		    return error_message
 	return wrapper
 
 # Decorator function to demarcate transaction printouts.
@@ -30,7 +32,7 @@ class VirtualShares:
 	free_shares = total_shares[0] 
 	bought_shares = 0            
 
-	@try_except
+	@safe_run
 	def __init__(self, owner_id: str, shares: float):
 		self.owner_id = owner_id
 
