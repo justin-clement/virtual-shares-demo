@@ -3,31 +3,28 @@
 def safe_run(func):
 	def wrapper(*args, **kwargs):
 		try:
-			result = func(*args, **kwargs)
-			return result
+			return func(*args, **kwargs)
 		except Exception as e:
 			print("\n")
-			error_message = {'status': False, 'message': f'An exception occured ({e})'}
-			print(error_message)   # In production, this will be passed to the error log.
-		    return error_message
+			error_message = {'status': False, 'message': f"An exception occurred ( {e} )"}
+			return error_message
 	return wrapper
 
 # Decorator function to demarcate transaction printouts.
 def line(func):
 	def wrapper(*args, **kwargs):
 		print("\n")
-		func(*args, **kwargs)
+		result = func(*args, **kwargs)
 		print("\n                ---------------------------------------")
+		return result
 	return wrapper
 
 
 class VirtualShares:
+	"""A class-based, object-oriented transaction system. 
+	Once initialized, the class keeps track of all transactions within it."""
 
-	"""
-	The three values below would be stored in a database during production.
-	For this model, once this class is initialized, it keeps track of
-	both free shares and bought shares.
-	"""
+	# In production, these three values would be stored in a database.
 	total_shares = (1000000,)      # Let's say we have 1 million shares. This is stored in a tuple for immutability.
 	free_shares = total_shares[0] 
 	bought_shares = 0            
@@ -64,7 +61,7 @@ class VirtualShares:
 
 		if VirtualShares.free_shares <= 0:
 			return print(" There are no available shares at the moment. Kindly check back later or consider buying from a user.")
-		if number_of_shares > (VirtualShares.free_shares or VirtualShares.total_shares) or number_of_shares <= 0:
+		if number_of_shares > VirtualShares.free_shares or number_of_shares <= 0:
 			return print(" The requested amount of shares are not available.")
 
 		updated_free_shares = VirtualShares.free_shares - number_of_shares
@@ -81,7 +78,7 @@ class VirtualShares:
 	
 	# The Sell function should be a private method. 	
 	@safe_run
-	def __sell(self, number_of_shares: float, buyer: object):
+	def __sell(self, number_of_shares: float, buyer: "VirtualShares"):
 		"""Initiate a sell transaction by a client (after agreement to sell)."""
 
 		if number_of_shares > self.__shares or number_of_shares <= 0:
@@ -99,12 +96,12 @@ class VirtualShares:
 
 	# This is the method used to call the Sell function.
 	@safe_run
-	def process_sell(self, number_of_shares: float, buyer: object):
+	def process_sell(self, number_of_shares: float, buyer: "VirtualShares"):
 		return self.__sell(number_of_shares, buyer)
 
 	@safe_run
 	@line
-	def peer_purchase(self, number_of_shares: float, seller: object):
+	def peer_purchase(self, number_of_shares: float, seller: "VirtualShares"):
 		"""Purchase shares from another user."""
 
 		if number_of_shares <= 0:
@@ -113,7 +110,7 @@ class VirtualShares:
 		initial_shares = self.__shares
 		seller_action = seller.process_sell(number_of_shares, self)
 		if not seller_action['status']:
-			print(" Transaction could not be completed. Please try again later.")
+			print(" Transaction could not be completed on seller's side.")
 			return {'status': False, 
 					'message': f"transaction could not be completed by seller ({seller_action['message']})"}
 		else:
