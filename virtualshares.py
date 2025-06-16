@@ -5,8 +5,8 @@ def safe_run(func):
 		try:
 			return func(*args, **kwargs)
 		except Exception as e:
-			print("\n")
 			error_message = {'status': False, 'message': f"An exception occurred ( {e} )"}
+			print("\n", error_message)
 			return error_message
 	return wrapper
 
@@ -33,7 +33,7 @@ class VirtualShares:
 	def __init__(self, owner_id: str, shares: float):
 		self.owner_id = owner_id
 
-		if shares >= VirtualShares.total_shares[0] or shares >= VirtualShares.free_shares or shares <= 0:
+		if shares >= VirtualShares.free_shares or shares <= 0:
 			raise ValueError(f" Unable to create account for {self.owner_id}. The given amount of shares are not available to own.")
 		else:
 			self.__shares = shares
